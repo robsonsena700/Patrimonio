@@ -1,0 +1,146 @@
+rest-express@1.0.0 dev
+4:20:28 PM [express] serving on port 5000s
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Connected to PostgreSQL database
+4:20:35 PM [express] GET /api/dashboard/stats 200 in 1428ms :: {"totalItems":10,"available":7,"alloc…
+4:20:39 PM [express] GET /api/empresa 304 in 142ms :: {"mantenedora":"PREFEITURA MUNICIPAL DE URUBUR…
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+4:20:40 PM [express] GET /api/produtos 304 in 979ms :: [{"pkproduto":4,"produto":"ACETATO DE BETAMET…
+4:20:40 PM [express] GET /api/tombamentos 304 in 982ms :: [{"pktombamento":11,"fkproduto":4458,"tomb…
+API call - Getting entries for product ID: 4459
+Error fetching product entries: error: relation "sotech.est_tombamento" does not exist
+    at /home/runner/workspace/node_modules/pg/lib/client.js:545:17
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async query (/home/runner/workspace/server/db.ts:31:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:152:22) {
+  length: 121,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '562',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1136',
+  routine: 'parserOpenTable'
+}
+4:20:48 PM [express] GET /api/produtos/4459/entradas 500 in 156ms :: {"error":"Erro interno do servi…
+4:20:48 PM [express] GET /api/produtos/4459/localizacao 200 in 152ms :: {"localizacao":""}
+Connected to PostgreSQL database
+4:21:07 PM [express] POST /api/tombamentos 201 in 1689ms :: {"message":"5 tombamentos criados com su…
+API call - Getting entries for product ID: 4459
+4:21:07 PM [express] GET /api/tombamentos 200 in 142ms :: [{"pktombamento":16,"fkproduto":4459,"tomb…
+Connected to PostgreSQL database
+Error fetching product entries: error: relation "sotech.est_tombamento" does not exist
+    at /home/runner/workspace/node_modules/pg/lib/client.js:545:17
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async query (/home/runner/workspace/server/db.ts:31:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:152:22) {
+  length: 121,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '562',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1136',
+  routine: 'parserOpenTable'
+}
+4:21:08 PM [express] GET /api/produtos/4459/entradas 500 in 981ms :: {"error":"Erro interno do servi…
+Connected to PostgreSQL database
+Connected to PostgreSQL database
+8:33:09 PM [express] GET /api/alocacoes 200 in 1400ms :: [{"pkalocacao":4,"fktombamento":1,"fkunidad…
+8:33:09 PM [express] GET /api/setores 200 in 1406ms :: [{"pksetor":3,"fkcentrocusto":null,"setor":"I…
+Connected to PostgreSQL database
+8:33:11 PM [express] GET /api/unidades-saude 200 in 2642ms :: [{"pkunidadesaude":5,"fkbairro":null,"…
+Connected to PostgreSQL database
+8:33:48 PM [express] GET /api/empresa 304 in 1455ms :: {"mantenedora":"PREFEITURA MUNICIPAL DE URUBU…
+8:54:32 PM [vite] hmr update /src/index.css?v=WssT8qvLgbAFGqziSHmjn, /src/pages/Dashboard.tsx, /src/pages/Classificacoes.tsx, /src/pages/Tombamento.tsx, /src/pages/Alocacao.tsx, /src/pages/Transferencia.tsx, /src/pages/Manutencao.tsx, /src/components/EtiquetaLoteModal.tsx, /src/components/modals/HistoricoModal.tsx, /src/components/modals/TransferenciaModal.tsx, /src/components/modals/ManutencaoModal.tsx
+8:54:33 PM [vite] hmr update /src/pages/Dashboard.tsx, /src/index.css?v=WssT8qvLgbAFGqziSHmjn, /src/pages/Classificacoes.tsx, /src/pages/Tombamento.tsx, /src/pages/Alocacao.tsx, /src/pages/Transferencia.tsx, /src/pages/Manutencao.tsx, /src/components/EtiquetaLoteModal.tsx, /src/components/modals/HistoricoModal.tsx, /src/components/modals/TransferenciaModal.tsx, /src/components/modals/ManutencaoModal.tsx
+8:54:33 PM [vite] hmr update /src/pages/Alocacao.tsx, /src/index.css?v=WssT8qvLgbAFGqziSHmjn
+8:54:34 PM [vite] page reload src/components/modals/AlocacaoModal.tsx
+8:54:34 PM [vite] Internal server error: /home/runner/workspace/client/src/pages/Alocacao.tsx: Expected corresponding JSX closing tag for <div>. (554:14)
+
+  552 |                   </Button>
+  553 |                 </div>
+> 554 |               </form>
+      |               ^
+  555 |             </CardContent>
+  556 |           </Card>
+  557 |         </div>
+  Plugin: vite:react-babel
+  File: /home/runner/workspace/client/src/pages/Alocacao.tsx:554:14
+  552|                    </Button>
+  553|                  </div>
+  554|                </form>
+     |                ^
+  555|              </CardContent>
+  556|            </Card>
+      at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1503:19)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:527:18)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:734:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:713:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:675:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3855:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:409:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:421:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:376:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at fn (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3708:23)
+      at tryParse (/home/runner/workspace/node_modules/@babel/parser/src/parser/util.ts:174:20)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3707:20)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:257:12)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3192:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:256:17)
+      at parseMaybeAssignAllowInOrVoidPattern (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3306:17)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1813:16)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1162:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:734:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:713:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:675:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3855:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:409:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:421:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:376:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3727:22)
+      at parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3187:16)
+      at parseExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at parseReturnStatement (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1110:28)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:538:21)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3185:20)
+      at parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:477:17)
+      at parseStatementListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:426:17)
+      at parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1439:16)
+      at parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1412:10)
+      at parseBlock (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1380:10)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:617:21)

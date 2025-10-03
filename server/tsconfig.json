@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2023"],
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": "..",
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true
+  },
+  "include": ["./**/*", "../shared/**/*", "../vite.config.ts"],
+  "exclude": ["node_modules", "dist", "../client", "../attached_assets"]
+}

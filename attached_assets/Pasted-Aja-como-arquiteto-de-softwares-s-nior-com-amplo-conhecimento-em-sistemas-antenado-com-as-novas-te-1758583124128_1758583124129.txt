@@ -1,0 +1,152 @@
+Aja como arquiteto de softwares sênior, com amplo conhecimento em sistemas, antenado com as novas tecnologias, principalmente relativas ao desenvolvimento de aplicações baseadas em microsserviços.
+
+Vamos construir uma aplicação base que será usada como ponto de partida para o desenvolvimento de novas telas/aplicações a partir dela.
+
+Faremos uma aplicação completa, com várias telas, para gestão de patrimônio de bens e produtos. A aplicação será chamada de uma aplicação framework pai, que irá chamar nossa aplicação através de rotas específicas que serão expostas.
+
+Para isso, a aplicação deverá expor sua rota para ser chamada através da aplicação framework, que passará parâmetros para nossa aplicação como usuários, banco de dados, tema, cores e outras mais que personalizaremos, bem como parâmetros funcionais, tais como id de um campo de uma tabela que iremos trabalhar e precisaremos receber os dados do registro.
+
+Para a criação de nossa aplicação, iremos trabalhar com um banco de dados próprio que você deve acessar e mapear, segue as credenciais de acesso ao banco:
+
+
+Host: db.redeis.com.br
+Port: 5555
+User: sotech
+Pass: SthNox@2022
+Db: dbapr
+
+Faremos várias telas totalmente funcionais que você deverá montar com base nas estruturas de tabelas abaixo. Você deve mapear todas essas tabelas no banco de dados e para cada tabela, criar um CRUD totalmente funcional e integrado.
+
+Durante o mapeamento das tabelas, verifique todas as informações disponíveis na estrutura dos dados, como constraints, integridade referencial, chaves estrangeiras, etc
+
+Não crie migrations ou outras ferramentas para modificar a estrutura de dados. Nunca altere as estruturas do banco de dados. 
+
+Seguem as tabelas:
+
+Tela: 	Classificações de Bens 
+Serve como tabela de apoio para indicar a classificação de um bem
+
+CREATE TABLE sotech.pat_classificacao (
+    pkclassificacao SERIAL PRIMARY KEY,
+    classificacao TEXT,
+    fkuser INTEGER DEFAULT 0 NOT NULL,
+    version INTEGER DEFAULT 0 NOT NULL,
+    ativo BOOLEAN DEFAULT true NOT NULL,
+    uuid UUID DEFAULT uuid_generate_v4() NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+    
+);
+
+Tela: 	Tombamento 
+Permite escolher o produto que teve entrada e, para cada produto, incluir uma linha com os dados do tombamento e informações como número serial
+
+CREATE TABLE sotech.pat_tombamento (
+    pktombamento SERIAL PRIMARY KEY,
+    fkproduto INTEGER,
+    tombamento VARCHAR(255) NOT NULL UNIQUE,
+    serial VARCHAR(255),
+    photos JSONB,
+    responsavel VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'disponivel',
+    fkuser INTEGER DEFAULT 0 NOT NULL,
+    version INTEGER DEFAULT 0 NOT NULL,
+    ativo BOOLEAN DEFAULT true NOT NULL,
+    uuid UUID DEFAULT uuid_generate_v4() NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    
+    -- Foreign Keys
+    CONSTRAINT fk_tombamento_produto 
+        FOREIGN KEY (fkproduto) REFERENCES est_produto(pkproduto)ON DELETE CASCADE,
+    
+    -- Constraints de validação
+    CONSTRAINT chk_tombamento_status 
+        CHECK (status IN ('disponivel', 'alocado', 'manutencao'))
+);
+
+Tela: 	Alocação 
+Tela onde serão informadas onde os itens tombados foram alocados. Cada item só pode ter uma alocação, ou seja, um fkunidadesaude
+
+CREATE TABLE sotech.pat_alocacao (
+    pkalocacao SERIAL PRIMARY KEY,
+    fktombamento INTEGER,
+    fkunidadesaude INTEGER,
+    fksetor INTEGER,
+    responsavel_unidade VARCHAR(255) NOT NULL,
+    dataalocacao TIMESTAMP NOT NULL,
+    photos JSONB,
+    termo TEXT,
+    responsavel VARCHAR(255),
+    fkuser INTEGER DEFAULT 0 NOT NULL,
+    version INTEGER DEFAULT 0 NOT NULL,
+    ativo BOOLEAN DEFAULT true NOT NULL,
+    uuid UUID DEFAULT uuid_generate_v4() NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    
+    -- Foreign Keys
+    CONSTRAINT fk_alocacao_tombamento 
+        FOREIGN KEY (fktombamento) REFERENCES pat_tombamento(pktombamento) ON DELETE CASCADE,
+    CONSTRAINT fk_alocacao_unidade 
+        FOREIGN KEY (fkunidadesaude) REFERENCES cdg_unidadesaude(pkunidadesaude) ON DELETE CASCADE,
+    CONSTRAINT fk_alocacao_setor 
+        FOREIGN KEY (fksetor) REFERENCES cdg_setor(pksetor) ON DELETE CASCADE
+);
+
+Tela: 	Transferência 
+Tela para movimentar um item tombado entre unidades, saindo de uma e indo para outra
+
+CREATE TABLE sotech.pat_transferencia (
+    pktransferencia SERIAL PRIMARY KEY,
+    fktombamento INTEGER,
+    fkunidadesaude_origem INTEGER,
+    fkunidadesaude_destino INTEGER,
+    fksetor_origem INTEGER,
+    fksetor_destino VARCHAR(255),
+    responsavel_destino VARCHAR(255),
+    datatasnferencia TIMESTAMP NOT NULL,
+    responsavel VARCHAR(255),
+    fkuser INTEGER DEFAULT 0 NOT NULL,
+    version INTEGER DEFAULT 0 NOT NULL,
+    ativo BOOLEAN DEFAULT true NOT NULL,
+    uuid UUID DEFAULT uuid_generate_v4() NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    
+    -- Foreign Keys
+    CONSTRAINT fk_transferencia_tombamento 
+        FOREIGN KEY (fktombamento) REFERENCES pat_tombamento(pktombamento) ON DELETE CASCADE,
+    CONSTRAINT fk_transferencia_origem 
+        FOREIGN KEY (fkunidadesaude_origem) REFERENCES cdg_unidadesaude(pkunidadesaude) ON DELETE SET NULL,
+    CONSTRAINT fk_transferncia_destino
+        FOREIGN KEY (fkunidadesaude_destino) REFERENCES cdg_unidadesaude(pkunidadesaude) ON DELETE SET NULL,
+    CONSTRAINT fk_transferencia_setor_destino 
+        FOREIGN KEY (fksetor_destino) REFERENCES cdg_setor(pksetor) ON DELETE SET NULL,
+    
+    -- Constraints de validação
+    CONSTRAINT chk_transferencia_destino_diferente
+        CHECK (fkunidadesaude_origem != fkunidadesaude_destino)
+);
+
+
+Tela: 	Manutenção 
+Controle de movimentação de itens com defeito, que estão em manutenção. Estes itens ficam alocados na mesma unidade, mas com status de manutenção externa, informando que não estão fisicamente na unidade e sem condições de uso
+
+CREATE TABLE sotech.pat_manutencao (
+    pkmanutencao SERIAL PRIMARY KEY,
+    fktombamento INTEGER,
+    dataretirada TIMESTAMP NOT NULL,
+    motivo TEXT NOT NULL,
+    responsavel VARCHAR(255),
+    dataretorno TIMESTAMP,
+    fkuser INTEGER DEFAULT 0 NOT NULL,
+    version INTEGER DEFAULT 0 NOT NULL,
+    ativo BOOLEAN DEFAULT true NOT NULL,
+    uuid UUID DEFAULT uuid_generate_v4() NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    
+    -- Foreign Keys
+    CONSTRAINT fk_manutencao_tombamento 
+        FOREIGN KEY (fktombamento) REFERENCES pat_tombamento(pktombamento) ON DELETE CASCADE,
+    
+    -- Constraints de validação
+    CONSTRAINT chk_manutencao_datas 
+        CHECK (dataretorno IS NULL OR dataretorno >= dataretirada)
+);
