@@ -89,18 +89,17 @@ Preferred communication style: Simple, everyday language.
 ### Build Process
 - **Client Build**: `vite build` compiles React frontend to `dist/public/` (497KB JS + 63KB CSS)
 - **Server Build**: `tsc -p server/tsconfig.json --noEmit false` compiles Express backend to `server/dist/server/`
-- **Post-Build Fix**: `scripts/fix-imports.js` automatically patches compiled files for ES module compatibility
 - **Start Script**: Production server runs from `node server/dist/server/index.js`
 
 ### Critical Configuration Details
 - **server/tsconfig.json**: Standalone configuration (no extends) with `noEmit: false` to force compilation
 - **Import Syntax**: Server files use `.js` extensions in imports (e.g., `import { routes } from "./routes.js"`)
 - **File Structure**: Compiled server preserves directory structure as `server/dist/server/*.js`
-- **Post-Build Fixes**: Automated script fixes:
-  1. Adds `.js` extension to `vite.config` import
-  2. Corrects static files path from `"public"` to `"../../../dist/public"`
+- **Static Files Path**: Uses `process.cwd()` to resolve `dist/public` from project root
+- **Vite Config Import**: Uses dynamic import with path resolution for ES module compatibility
 
-### Known Issues & Solutions
-- **TypeScript noEmit**: Root tsconfig.json has `noEmit: true` which prevents compilation. server/tsconfig.json must override this with standalone configuration
-- **Path Resolution**: Compiled server needs `../../../dist/public` to reach static files from `server/dist/server/`
+### Path Resolution Strategy
+- **Development**: Vite middleware serves files from `client/` directory
+- **Production**: Static files served from `dist/public/` using `process.cwd()` as base
+- **Server Location**: Compiled to `server/dist/server/` but resolves paths from project root
 - **ES Module Imports**: Node.js requires explicit `.js` extensions for relative imports when using `"type": "module"`
