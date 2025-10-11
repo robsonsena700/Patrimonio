@@ -9,8 +9,7 @@ const connectionConfig = {
   database: process.env.DB_NAME || 'dbapr',
   ssl: {
     rejectUnauthorized: false
-  },
-  schema: process.env.DB_SCHEMA || 'sotech'
+  }
 };
 
 export const pool = new Pool(connectionConfig);
