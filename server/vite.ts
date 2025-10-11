@@ -107,9 +107,9 @@ export function serveStatic(app: Express) {
   }));
 
   // SPA fallback - serve index.html for all non-API routes
-  app.get("*", (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith("/api")) {
+  app.use((req, res, next) => {
+    // Skip API routes and static files
+    if (req.path.startsWith("/api") || req.path.includes('.')) {
       return next();
     }
     
