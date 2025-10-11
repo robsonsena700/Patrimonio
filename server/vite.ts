@@ -94,11 +94,12 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // Serve static assets with caching
+  // Serve static assets with caching (skip index.html here)
   app.use(express.static(distPath, {
     maxAge: '1y',
     etag: true,
     lastModified: true,
+    index: false, // Don't serve index.html automatically
     setHeaders: (res, filepath) => {
       if (filepath.endsWith('index.html')) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -108,12 +109,17 @@ export function serveStatic(app: Express) {
 
   // SPA fallback - serve index.html for all non-API routes
   app.use((req, res, next) => {
-    // Skip API routes and static files
-    if (req.path.startsWith("/api") || req.path.includes('.')) {
+    // Skip API routes
+    if (req.path.startsWith("/api")) {
       return next();
     }
     
-    res.sendFile(indexPath);
+    // Serve index.html for all other routes (SPA routing)
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        next(err);
+      }
+    });
   });
 
   log(`Serving static files from ${distPath}`);
