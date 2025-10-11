@@ -72,14 +72,12 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  
-  // Resolve paths relative to the compiled server location
-  const distPath = path.resolve(__dirname, "..", "..", "dist", "public");
+  // In production, the build outputs to dist/public at the project root
+  // The working directory is the project root
+  const distPath = path.join(process.cwd(), "dist", "public");
   const indexPath = path.join(distPath, "index.html");
 
   console.log('Production static file configuration:');
-  console.log('- Server dirname:', __dirname);
   console.log('- Working directory:', process.cwd());
   console.log('- Dist path:', distPath);
   console.log('- Index path:', indexPath);
