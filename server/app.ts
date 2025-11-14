@@ -12,11 +12,11 @@ export async function createApp(): Promise<{ app: Express; server: import("http"
     const path = req.path;
     let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-    const originalResJson = res.json;
-    res.json = function (bodyJson, ...args) {
-      capturedJsonResponse = bodyJson;
-      return originalResJson.apply(res, [bodyJson, ...args]);
-    } as any;
+    const originalResJson: Response['json'] = res.json.bind(res);
+    (res as any).json = (bodyJson?: any) => {
+      capturedJsonResponse = bodyJson as any;
+      return originalResJson(bodyJson);
+    };
 
     res.on("finish", () => {
       const duration = Date.now() - start;

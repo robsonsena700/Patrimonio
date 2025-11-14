@@ -1,4 +1,4 @@
-import { createApp } from "../server/app.js";
+import { createApp } from "../server/app";
 import serverless from "serverless-http";
 
 let handlerPromise: Promise<any> | null = null;
