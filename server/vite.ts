@@ -2,11 +2,14 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 
+//const viteLogger = createLogger();
+const __filename = fileURLToPath(import.meta.url); 
+const __dirname = path.dirname(__filename); 
 const viteLogger = createLogger();
 
 export function log(message: string, source = "express") {
@@ -21,9 +24,10 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const viteConfigPath = path.join(__dirname, '..', 'vite.config.js');
-  const { default: viteConfig } = await import(viteConfigPath);
+  //const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const viteConfigPath = path.join(__dirname, '..', 'vite.config.ts');
+  const viteConfigUrl = pathToFileURL(viteConfigPath).href;
+  const { default: viteConfig } = await import(viteConfigUrl);
 
   const serverOptions = {
     middlewareMode: true,
@@ -48,10 +52,19 @@ export async function setupVite(app: Express, server: Server) {
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+    if (req.path.startsWith('/api') || url.startsWith('/api')) {
+      return next();
+    }
 
     try {
+      //const clientTemplate = path.resolve(
+      //import.meta.dirname,
+      //"..",
+      //"client",
+      //"index.html",
+      //);
       const clientTemplate = path.resolve(
-        import.meta.dirname,
+        __dirname,
         "..",
         "client",
         "index.html",
@@ -74,9 +87,11 @@ export async function setupVite(app: Express, server: Server) {
 export function serveStatic(app: Express) {
   // In production, the build outputs to dist/public at the project root
   // The working directory is the project root
-  const distPath = path.join(process.cwd(), "dist", "public");
+  const projectRoot = path.join(__dirname, ".."); 
+  const distPath = path.join(projectRoot, "dist", "public");
   const indexPath = path.join(distPath, "index.html");
 
+  
   console.log('Production static file configuration:');
   console.log('- Working directory:', process.cwd());
   console.log('- Dist path:', distPath);

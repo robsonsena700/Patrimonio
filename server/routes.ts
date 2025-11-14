@@ -20,9 +20,14 @@ import { fileURLToPath } from 'url';
  * - /classificacoes?menu=false (Classificações page without menu)
  */
 
+const uploadsDir = path.join(process.cwd(), 'uploads');
+try {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+} catch {}
+
 // Configure multer for file uploads
 const upload = multer({
-  dest: 'uploads/',
+  dest: uploadsDir,
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
@@ -82,6 +87,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Health check routes
+  app.get('/api/health', (_req, res) => {
+    res.json({ status: 'ok', env: process.env.NODE_ENV });
+  });
+
+  app.get('/api/health/db', async (_req, res) => {
+    try {
+      const result = await query('SELECT 1 as ok');
+      res.json({ connected: true, result: result.rows[0] });
+    } catch (error: any) {
+      res.status(500).json({ connected: false, error: String(error?.message || error) });
     }
   });
 

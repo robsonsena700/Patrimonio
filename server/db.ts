@@ -2,17 +2,19 @@
 import { Pool } from 'pg';
 
 const connectionConfig = {
-  host: process.env.DB_HOST || 'db.redeis.com.br',
-  port: parseInt(process.env.DB_PORT || '5555'),
-  user: process.env.DB_USER || 'sotech',
-  password: process.env.DB_PASSWORD || 'SthNox@2022',
-  database: process.env.DB_NAME || 'dbapr',
-  ssl: {
-    rejectUnauthorized: false
-  }
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || ''),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
 };
 
 export const pool = new Pool(connectionConfig);
+
+if (!connectionConfig.host || !connectionConfig.user || !connectionConfig.password || !connectionConfig.database || !connectionConfig.port) {
+  throw new Error('Missing required database environment variables');
+}
 
 // Test connection
 pool.on('connect', () => {
