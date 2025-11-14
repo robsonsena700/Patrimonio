@@ -34,7 +34,9 @@ jobs:
         run: npm run typecheck
 
       - name: Build
-        run: npm run build
+        run: |
+          npm run build:client
+          npm run build:server
 
       - name: Summary
         run: |
