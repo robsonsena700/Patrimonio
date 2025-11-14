@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Typecheck
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        node: [ 20 ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Summary
+        run: |
+          echo "OS: ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
+          echo "Node: ${{ matrix.node }}" >> $GITHUB_STEP_SUMMARY
