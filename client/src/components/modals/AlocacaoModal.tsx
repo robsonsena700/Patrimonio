@@ -331,6 +331,8 @@ export default function AlocacaoModal({ isOpen, onClose, editingItem }: Alocacao
               />
             </div>
 
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="responsavel_unidade" className="text-sm font-medium text-foreground">

@@ -182,7 +182,7 @@ export default function TombamentoPublico() {
                           {photos.slice(0, 4).map((photo: any, index: number) => (
                             <img
                               key={index}
-                              src={`/uploads/${photo.filename}`}
+                              src={photo.url ? photo.url : `/uploads/${photo.filename}`}
                               alt={`Foto ${index + 1}`}
                               className="w-full h-20 object-cover rounded border"
                             />

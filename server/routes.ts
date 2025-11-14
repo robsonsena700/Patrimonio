@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
 import { query } from "./db.js";
 import multer from "multer";
+import { put } from "@vercel/blob";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
@@ -20,29 +21,42 @@ import { fileURLToPath } from 'url';
  * - /classificacoes?menu=false (Classificações page without menu)
  */
 
+const isServerless = !!process.env.VERCEL;
 const uploadsDir = path.join(process.cwd(), 'uploads');
 try {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+  if (!isServerless) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
 } catch {}
 
 // Configure multer for file uploads
 const upload = multer({
-  dest: uploadsDir,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-  fileFilter: (req, file, cb) => {
+  storage: isServerless ? multer.memoryStorage() : multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadsDir),
+    filename: (_req, file, cb) => cb(null, `${Date.now()}-${Math.random().toString(16).slice(2)}-${file.originalname}`)
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Apenas imagens são permitidas!'));
-    }
+    if (mimetype && extname) cb(null, true); else cb(new Error('Apenas imagens são permitidas!'));
   }
 });
+
+async function processUploadedFiles(files: Express.Multer.File[] | undefined) {
+  if (!files || files.length === 0) return undefined;
+  if (!isServerless) {
+    return files.map(f => ({ originalName: f.originalname, filename: (f as any).filename || f.originalname, mimetype: f.mimetype, size: f.size }));
+  }
+  const results = [] as any[];
+  for (const file of files) {
+    const key = `uploads/${Date.now()}-${Math.random().toString(16).slice(2)}-${file.originalname}`;
+    const r = await put(key, file.buffer as Buffer, { access: 'public', contentType: file.mimetype });
+    results.push({ originalName: file.originalname, url: r.url, mimetype: file.mimetype, size: file.size });
+  }
+  return results;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
@@ -50,6 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/uploads/:filename", (req, res) => {
     try {
       const filename = req.params.filename;
+      if (isServerless) return res.status(404).json({ error: 'Imagem não disponível' });
       const filepath = path.join(process.cwd(), 'uploads', filename);
 
       // Check if file exists
@@ -341,15 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Handle uploaded photos
-      let photos = undefined;
-      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-        photos = (req.files as Express.Multer.File[]).map(file => ({
-          originalName: file.originalname,
-          filename: file.filename,
-          mimetype: file.mimetype,
-          size: file.size
-        }));
-      }
+      const photos = await processUploadedFiles(req.files as Express.Multer.File[] | undefined);
 
       // Check if it's a batch tombamento (starts with $)
       if (tombamento.startsWith('$')) {
@@ -437,12 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle uploaded photos
       if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-        updates.photos = (req.files as Express.Multer.File[]).map(file => ({
-          originalName: file.originalname,
-          filename: file.filename,
-          mimetype: file.mimetype,
-          size: file.size
-        }));
+        updates.photos = await processUploadedFiles(req.files as Express.Multer.File[] | undefined);
       }
 
       if (updates.fkproduto) {
@@ -493,15 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Handle uploaded photos
-      let photos = undefined;
-      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-        photos = (req.files as Express.Multer.File[]).map(file => ({
-          originalName: file.originalname,
-          filename: file.filename,
-          mimetype: file.mimetype,
-          size: file.size
-        }));
-      }
+      const photos = await processUploadedFiles(req.files as Express.Multer.File[] | undefined);
 
       const newAlocacao = await storage.createAlocacao({
         fktombamento: parseInt(fktombamento),
@@ -530,12 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle uploaded photos
       if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-        updates.photos = (req.files as Express.Multer.File[]).map(file => ({
-          originalName: file.originalname,
-          filename: file.filename,
-          mimetype: file.mimetype,
-          size: file.size
-        }));
+        updates.photos = await processUploadedFiles(req.files as Express.Multer.File[] | undefined);
       }
 
       // Convert string fields to proper types

@@ -34,7 +34,7 @@ export default function ImageGallery({ photos, title = "Imagens", className = ""
   }
 
   const handleImageClick = (image: any) => {
-    setSelectedImage(image.filename);
+    setSelectedImage(image.url || image.filename);
     setZoomLevel(1);
   };
 
@@ -53,7 +53,7 @@ export default function ImageGallery({ photos, title = "Imagens", className = ""
 
   const handleDownload = (image: any) => {
     const link = document.createElement('a');
-    link.href = `/api/uploads/${image.filename}`;
+    link.href = image.url ? image.url : `/api/uploads/${image.filename}`;
     link.download = image.originalName || image.filename;
     document.body.appendChild(link);
     link.click();
@@ -71,12 +71,12 @@ export default function ImageGallery({ photos, title = "Imagens", className = ""
         {imageList.map((image: any, index: number) => (
           <div key={index} className="relative group cursor-pointer">
             <img
-              src={`/api/uploads/${image.filename}`}
+              src={image.url ? image.url : `/api/uploads/${image.filename}`}
               alt={image.originalName || `Imagem ${index + 1}`}
               className="w-full h-20 object-cover rounded-lg border border-border hover:border-primary transition-colors"
               onClick={() => handleImageClick(image)}
               onError={(e) => {
-                console.error('Error loading image:', image.filename);
+                console.error('Error loading image:', image.filename || image.url);
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
@@ -130,7 +130,7 @@ export default function ImageGallery({ photos, title = "Imagens", className = ""
           <div className="flex items-center justify-center overflow-auto max-h-[70vh]">
             {selectedImage && (
               <img
-                src={`/api/uploads/${selectedImage}`}
+                src={selectedImage?.startsWith('http') ? selectedImage : `/api/uploads/${selectedImage}`}
                 alt="Imagem ampliada"
                 className="max-w-full h-auto rounded-lg"
                 style={{ 
