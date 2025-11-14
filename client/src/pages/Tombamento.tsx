@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTombamentos, useCreateTombamento, useUpdateTombamento, useProdutos, useProdutoEntradas, useProdutoLocalizacao } from "@/hooks/usePatrimonio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,7 +47,7 @@ export default function Tombamento() {
   const { data: produtoLocalizacao } = useProdutoLocalizacao(selectedProdutoId);
 
   // Buscar dados da empresa
-  useState(() => {
+  useEffect(() => {
     fetch('/api/empresa')
       .then(response => response.json())
       .then(data => setEmpresaData(data))
